@@ -166,6 +166,16 @@ Function GenerateResourcesAndImage {
         throw "'packer' binary is not found on PATH"
     }
 
+    if($ResourceGroupName -eq "DGSCUCORERG04")
+    {
+        $tempResourceGroup = "DGSCUCORERGTMP04";
+    }
+
+    if($ResourceGroupName -eq "DGSCUCORERG05")
+    {
+        $tempResourceGroup = "DGSCUCORERGTMP05";
+    }
+
     & $packerBinary build -on-error=ask `
         -var "client_id=$($spClientId)" `
         -var "client_secret=$($ServicePrincipalClientSecret)" `
@@ -177,5 +187,6 @@ Function GenerateResourcesAndImage {
         -var "storage_account=$($storageAccountName)" `
         -var "install_password=$($InstallPassword)" `
         -var "github_feed_token=$($GithubFeedToken)" `
+        -var "temp_resource_group_name=$($tempResourceGroup)" `
         $builderScriptPath
 }
