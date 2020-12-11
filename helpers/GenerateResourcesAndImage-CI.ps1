@@ -126,46 +126,12 @@ Function GenerateResourcesAndImage {
     Connect-AzAccount -ServicePrincipal -TenantId $tenantId -Credential $credentials
     Set-AzContext -SubscriptionId $SubscriptionId
 
-    $alreadyExists = $true;
     try {
         Get-AzResourceGroup -Name $ResourceGroupName
         Write-Verbose "Resource group was found, will delete and recreate it."
     }
     catch {
-        Write-Verbose "Resource group was not found, will create it."
-        $alreadyExists = $false;
-    }
-
-    if ($alreadyExists) {
-        if($Force -eq $true) {
-            # Cleanup the resource group if it already exitsted before
-            Remove-AzResourceGroup -Name $ResourceGroupName -Force
-            New-AzResourceGroup -Name $ResourceGroupName -Location $AzureLocation
-        } else {
-            $title = "Delete Resource Group"
-            $message = "The resource group you specified already exists. Do you want to clean it up?"
-
-            $yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes", `
-                "Delete the resource group including all resources."
-
-            $no = New-Object System.Management.Automation.Host.ChoiceDescription "&No", `
-                "Keep the resource group and continue."
-
-            $stop = New-Object System.Management.Automation.Host.ChoiceDescription "&Stop", `
-                "Stop the current action."
-
-            $options = [System.Management.Automation.Host.ChoiceDescription[]]($yes, $no, $stop)
-            $result = $host.ui.PromptForChoice($title, $message, $options, 0)
-
-            switch ($result)
-            {
-                0 { Remove-AzResourceGroup -Name $ResourceGroupName -Force; New-AzResourceGroup -Name $ResourceGroupName -Location $AzureLocation }
-                1 { <# Do nothing #> }
-                2 { exit }
-            }
-        }
-    } else {
-        New-AzResourceGroup -Name $ResourceGroupName -Location $AzureLocation
+        Write-Verbose "Resource group was not found"
     }
 
     # This script should follow the recommended naming conventions for azure resources
